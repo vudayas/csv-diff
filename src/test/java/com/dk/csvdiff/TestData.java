@@ -10,14 +10,13 @@ import java.io.Writer;
 public class TestData {
     public static String nameA;
     public static String nameB;
-    public static Reader inA;
-    public static Reader inB;
     public static String output;
-    public static Writer out;
 
     public static String dataA;
     public static String dataB;
-    public static String dataOut;
+    public static String dataOutDisplayMatchingDisplayMissing;
+    public static String dataOutZeroMatchingNull;
+    public static String dataOutZeroNotMatchingNullNoDisplay;
     public static String stdOut;
 
     public static String idColumn;
@@ -46,20 +45,34 @@ public class TestData {
                 "101,,,,0,\n" + 
                 "102,,,,,";
 
-        dataOut = "a,b,c,col X\n" +
-                        "7,yo" + Diff.DIFF_MARKER_A + "," + Diff.DIFF_MARKER_B + "world,0" + Diff.DIFF_MARKER_A + "\n" +
-                        "6,999,111" + Diff.DIFF_MARKER_A + Diff.DIFF_MARKER_B + "222,six\n" +
-                        "1,2,3,one\n" +
-                        "2,k,stuff,two\n" +
-                        "3,hi" + Diff.DIFF_MARKER_A + Diff.DIFF_MARKER_B + "hello,there,\"three, three" + Diff.DIFF_MARKER_A + Diff.DIFF_MARKER_B + "three,three\"\n" +
-                        "101,,," + Diff.DIFF_MARKER_B + "0\n" +
-                        "102,,,\n" +
-                        Diff.RECORD_DIFF_MARKER_A + "\n" +
-                        Diff.DIFF_MARKER_A + "100,,,\n" +
-                        Diff.DIFF_MARKER_A + "4,0,0,four\n" +
-                        Diff.RECORD_DIFF_MARKER_B + "\n" +
-                        Diff.DIFF_MARKER_B + "5,0,0,five\n";
+        dataOutDisplayMatchingDisplayMissing = 
+				"a,b,c,col X\n" +
+                "7,yo" + Diff.DIFF_MARKER_A + "," + Diff.DIFF_MARKER_B + "world,0" + Diff.DIFF_MARKER_A + "\n" +
+                "6,999,111" + Diff.DIFF_MARKER_A + Diff.DIFF_MARKER_B + "222,six\n" +
+                "1,2,3,one\n" +
+                "2,k,stuff,two\n" +
+                "3,hi" + Diff.DIFF_MARKER_A + Diff.DIFF_MARKER_B + "hello,there,\"three, three" + Diff.DIFF_MARKER_A + Diff.DIFF_MARKER_B + "three,three\"\n" +
+                "101,,," + Diff.DIFF_MARKER_B + "0\n" +
+                "102,,,\n" +
+                Diff.RECORD_DIFF_MARKER_A + "\n" +
+                Diff.DIFF_MARKER_A + "100,,,\n" +
+                Diff.DIFF_MARKER_A + "4,0,0,four\n" +
+                Diff.RECORD_DIFF_MARKER_B + "\n" +
+                Diff.DIFF_MARKER_B + "5,0,0,five\n";
 
+        dataOutZeroMatchingNull = 
+        		"a,b,c,col X\n" + 
+        		"7,yo<<,>>world,\n" + 
+        		"6,,111<<>>222,\n" + 
+        		"3,hi<<>>hello,,\"three, three<<>>three,three\"\n";
+        
+        dataOutZeroNotMatchingNullNoDisplay =
+        		"a,b,c,col X\n" + 
+        		"7,yo<<,>>world,0<<\n" + 
+        		"6,,111<<>>222,\n" + 
+        		"3,hi<<>>hello,,\"three, three<<>>three,three\"\n" + 
+        		"101,,,>>0\n";
+        
         stdOut = "Columns missing from dataA:\n" + 
         		"d\n" + 
         		"missing,col\n" + 
@@ -78,10 +91,7 @@ public class TestData {
         
         nameA = "dataA";
         nameB = "dataB";
-        inA = new StringReader(dataA);
-        inB = new StringReader(dataB);
         output = "output data";
-        out = new StringWriter();
     }
     
     /**
@@ -90,7 +100,11 @@ public class TestData {
      * @throws IOException 
      */
     public static void main(String[] args) throws IOException {
-    	if (args.length != 3) {
+        Reader inA = new StringReader(dataA);
+        Reader inB = new StringReader(dataB);
+        Writer out = new StringWriter();
+
+        if (args.length != 3) {
     		System.err.println("Incorrect command line - provide 3 filenames to write data.");
     		return;
     	}
@@ -102,7 +116,7 @@ public class TestData {
     		w.write(dataB);
     	}
     	try (Writer w = new FileWriter(args[2])) {
-    		w.write(dataOut);
+    		w.write(dataOutDisplayMatchingDisplayMissing);
     	}
     	
     	System.out.println("Done");
